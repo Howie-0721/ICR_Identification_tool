@@ -126,6 +126,7 @@ class ICRModernApp(tk.Tk):
         action_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Action", menu=action_menu)
         action_menu.add_command(label="Run", command=self.start_testing)
+        action_menu.add_command(label="No Answer Run", command=self.start_no_answer_testing)
         action_menu.add_command(label="Stop", command=self.stop_testing)
         
         # Config 選單
