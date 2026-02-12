@@ -1,0 +1,74 @@
+name: multi-platform-build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare config.ini (from example)
+        shell: bash
+        run: |
+          cp -f config.example.ini config.ini
+
+      - name: Build (PyInstaller)
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            pyinstaller perf_test.spec --clean
+          else
+            pyinstaller perf_test.macos.spec --clean --noupx
+          fi
+
+      - name: Add runtime folders/files
+        shell: bash
+        run: |
+          mkdir -p dist/perf_test/Answer dist/perf_test/DB dist/perf_test/Log \
+                   dist/perf_test/Upload_folder/ARC dist/perf_test/Upload_folder/Health dist/perf_test/Upload_folder/Employment
+          # Include DB CSVs required by the app
+          cp -f DB/*.csv dist/perf_test/DB/ || true
+
+      - name: Archive artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (Test-Path dist\\perf_test.zip) { Remove-Item dist\\perf_test.zip -Force }
+          Compress-Archive -Path dist\\perf_test -DestinationPath dist\\perf_test-${{ runner.os }}.zip
+
+      - name: Archive artifact (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          cd dist
+          zip -r "perf_test-${{ runner.os }}.zip" perf_test
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf_test-${{ runner.os }}
+          path: dist/perf_test-${{ runner.os }}.zip
