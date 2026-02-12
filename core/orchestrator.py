@@ -56,6 +56,7 @@ class TestOrchestrator:
         stop_check_callback: Optional[Callable[[], bool]] = None,
         sftp_config_override: Optional[Dict[str, str]] = None,
         db_config_override: Optional[Dict[str, any]] = None,
+        api_config_override: Optional[Dict[str, str]] = None,
         answer_format: str = "分行呈現"
     ) -> Dict[str, any]:
         """
@@ -117,7 +118,8 @@ class TestOrchestrator:
             upload_full_path,
             stop_check_callback,
             sftp_config_override,
-            db_config_override
+            db_config_override,
+            api_config_override
         )
         
         # Step 5: 匯出資料庫
@@ -145,6 +147,7 @@ class TestOrchestrator:
         stop_check_callback: Optional[Callable[[], bool]] = None,
         sftp_config_override: Optional[Dict[str, str]] = None,
         db_config_override: Optional[Dict[str, any]] = None,
+        api_config_override: Optional[Dict[str, str]] = None,
         answer_format: str = "分行呈現"
     ) -> Dict[str, any]:
         """
@@ -191,7 +194,8 @@ class TestOrchestrator:
             upload_full_path,
             stop_check_callback,
             sftp_config_override,
-            db_config_override
+            db_config_override,
+            api_config_override
         )
         
         # Step 3: 匯出資料庫
@@ -303,7 +307,8 @@ class TestOrchestrator:
         upload_path: str,
         stop_check_callback: Optional[Callable] = None,
         sftp_config_override: Optional[Dict[str, str]] = None,
-        db_config_override: Optional[Dict[str, any]] = None
+        db_config_override: Optional[Dict[str, any]] = None,
+        api_config_override: Optional[Dict[str, str]] = None
     ) -> str:
         """
         上傳檔案並執行辨識
@@ -320,6 +325,7 @@ class TestOrchestrator:
         # 取得配置（優先使用覆蓋設定）
         sftp_config = self.config.get_sftp_config(sftp_config_override)
         db_config = self.config.get_db_config(db_config_override)
+        api_config = self.config.get_api_config(api_config_override)
         # login_creds 已移除，不再需要
         
         # 上傳檔案
@@ -350,6 +356,7 @@ class TestOrchestrator:
                 self.config.urls.systalk,
                 self.config.urls.icr,
                 self.config.urls.document_manage,
+                api_config,
                 stop_check_callback
             )
             upload_id = asyncio.run(web_automation.monitor_and_recognize(

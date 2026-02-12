@@ -104,9 +104,9 @@ class LoggerManager:
         # logger.addHandler(console_handler)
         
         # 記錄初始訊息
-        logger.info("=" * 60)
+        logger.info("=" * 40)
         logger.info("ICR 辨識率測試系統已啟動")
-        logger.info("=" * 60)
+        logger.info("=" * 40)
         
         return logger
     
@@ -131,9 +131,9 @@ class LoggerManager:
         if logger is None:
             logger = LoggerManager.get_logger()
         
-        logger.info("-" * 60)
+        logger.info("-" * 40)
         logger.info(f"【{title}】")
-        logger.info("-" * 60)
+        logger.info("-" * 40)
     
     @staticmethod
     def log_step(step_num: int, total_steps: int, title: str, logger: Optional[logging.Logger] = None):
@@ -142,4 +142,4 @@ class LoggerManager:
             logger = LoggerManager.get_logger()
         
         logger.info(f"【步驟 {step_num}/{total_steps}】{title}")
-        logger.info("-" * 60)
+        logger.info("-" * 40)

@@ -19,6 +19,7 @@ class RecognitionAutomation:
         systalk_url: str,
         icr_url: str,
         document_manage_url: str,
+        api_config: Optional[Dict[str, str]] = None,
         stop_check_callback: Optional[Callable[[], bool]] = None
     ):
         """
@@ -29,6 +30,7 @@ class RecognitionAutomation:
             systalk_url: Systalk 系統 URL
             icr_url: ICR 系統 URL
             document_manage_url: 文件管理 URL
+            api_config: API 設定（host/port/api/region）
             stop_check_callback: 停止檢查回呼函式
         """
         self.login_url = login_url
@@ -36,8 +38,17 @@ class RecognitionAutomation:
         self.icr_url = icr_url
         self.document_manage_url = document_manage_url
         self.logger = logging.getLogger("ICRLogger")
-        self.api_url = "http://192.168.160.67:5003/api/v1/batchRecognition"
-        self.regions = ["taipei"]
+        api_config = api_config or {}
+        host = api_config.get('host', '127.0.0.1')
+        port = api_config.get('port', '5003')
+        api_path = api_config.get('api', '/api/v1/batchRecognition')
+        region = api_config.get('region', 'taipei')
+
+        if api_path and not api_path.startswith('/'):
+            api_path = f"/{api_path}"
+
+        self.api_url = f"http://{host}:{port}{api_path}"
+        self.regions = [region] if region else ["taipei"]
         self.stop_check_callback = stop_check_callback
     
     def get_completed_document_count(

@@ -88,17 +88,22 @@ class ICRModernApp(tk.Tk):
         
         # 設定頁變數
         self.sftp_protocol_var = tk.StringVar(value="SFTP")
-        self.sftp_host_var = tk.StringVar(value="192.168.160.67")
+        self.sftp_host_var = tk.StringVar(value="127.0.0.1")
         self.sftp_port_var = tk.StringVar(value="22")
-        self.sftp_username_var = tk.StringVar(value="tpiuser")
-        self.sftp_password_var = tk.StringVar(value="1qaz@WSX3edc")
-        self.sftp_remote_path_var = tk.StringVar(value="/home/tpiuser/icr-backend/imports/taipei/")
+        self.sftp_username_var = tk.StringVar(value="your_username")
+        self.sftp_password_var = tk.StringVar(value="your_password")
+        self.sftp_remote_path_var = tk.StringVar(value="/path/to/remote/")
+
+        self.api_host_var = tk.StringVar(value="127.0.0.1")
+        self.api_port_var = tk.StringVar(value="5003")
+        self.api_path_var = tk.StringVar(value="/api/v1/batchRecognition")
+        self.api_region_var = tk.StringVar(value="taipei")
         
-        self.db_host_var = tk.StringVar(value="192.168.160.67")
-        self.db_port_var = tk.StringVar(value="5555")
+        self.db_host_var = tk.StringVar(value="127.0.0.1")
+        self.db_port_var = tk.StringVar(value="5432")
         self.db_database_var = tk.StringVar(value="postgres")
         self.db_username_var = tk.StringVar(value="postgres")
-        self.db_password_var = tk.StringVar(value="1qaz@WSX3edc")
+        self.db_password_var = tk.StringVar(value="your_password")
         
         # 建立 UI
         self.setup_ui()
@@ -187,7 +192,8 @@ class ICRModernApp(tk.Tk):
         # 創建執行頁
         self.create_execution_tab()
         
-        # 創建設定頁
+        # 創建設定分頁（API -> WinSCP -> DATABASE）
+        self.create_api_tab()
         self.create_sftp_tab()
         self.create_database_tab()
         
@@ -269,18 +275,46 @@ class ICRModernApp(tk.Tk):
         ttk.Entry(step4_frame, textvariable=self.log_path_var, state="readonly").grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
         ttk.Button(step4_frame, text="瀏覽", command=self.select_log_path, width=8).grid(row=0, column=2, sticky=tk.EW, padx=5, pady=5)
     
+    def create_api_tab(self):
+        """創建 API 設定頁分頁"""
+        api_tab = ttk.Frame(self.notebook, padding="10")
+        self.notebook.add(api_tab, text="API 設定")
+
+        # ===== API 設定 =====
+        api_frame = ttk.LabelFrame(api_tab, text="API 設定", padding="10")
+        api_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+
+        ttk.Label(api_frame, text="Host:").grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
+        ttk.Entry(api_frame, textvariable=self.api_host_var).grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
+
+        ttk.Label(api_frame, text="Port:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
+        ttk.Entry(api_frame, textvariable=self.api_port_var).grid(row=1, column=1, sticky=tk.EW, padx=5, pady=5)
+
+        ttk.Label(api_frame, text="API:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+        ttk.Entry(api_frame, textvariable=self.api_path_var).grid(row=2, column=1, sticky=tk.EW, padx=5, pady=5)
+
+        ttk.Label(api_frame, text="Region:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
+        ttk.Entry(api_frame, textvariable=self.api_region_var).grid(row=3, column=1, sticky=tk.EW, padx=5, pady=5)
+
+        api_frame.columnconfigure(1, weight=1)
+
     def create_sftp_tab(self):
-        """創建 SFTP 設定頁分頁"""
+        """創建 WinSCP 設定頁分頁"""
         sftp_tab = ttk.Frame(self.notebook, padding="10")
         self.notebook.add(sftp_tab, text="WinSCP")
-        
-        # ===== SFTP 設定 =====
+
+        # ===== WinSCP 設定 =====
         sftp_frame = ttk.LabelFrame(sftp_tab, text="WinSCP 設定", padding="10")
         sftp_frame.pack(fill=tk.BOTH, expand=True, pady=5)
         
         # Protocol
         ttk.Label(sftp_frame, text="Protocol:").grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
-        ttk.Entry(sftp_frame, textvariable=self.sftp_protocol_var).grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
+        ttk.Combobox(
+            sftp_frame,
+            textvariable=self.sftp_protocol_var,
+            values=["SFTP", "SCP", "FTP"],
+            state='readonly'
+        ).grid(row=0, column=1, sticky=tk.EW, padx=5, pady=5)
         
         # Host
         ttk.Label(sftp_frame, text="Host:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
@@ -499,6 +533,17 @@ class ICRModernApp(tk.Tk):
                     self.sftp_password_var.set(self.config.get('SFTP', 'password'))
                 if self.config.has_option('SFTP', 'remote_path'):
                     self.sftp_remote_path_var.set(self.config.get('SFTP', 'remote_path'))
+
+            # 載入 API 設定
+            if self.config.has_section('API'):
+                if self.config.has_option('API', 'host'):
+                    self.api_host_var.set(self.config.get('API', 'host'))
+                if self.config.has_option('API', 'port'):
+                    self.api_port_var.set(self.config.get('API', 'port'))
+                if self.config.has_option('API', 'api'):
+                    self.api_path_var.set(self.config.get('API', 'api'))
+                if self.config.has_option('API', 'region'):
+                    self.api_region_var.set(self.config.get('API', 'region'))
             
             # 載入 DATABASE 設定
             if self.config.has_section('DATABASE'):
@@ -549,6 +594,14 @@ class ICRModernApp(tk.Tk):
             self.config.set('SFTP', 'username', self.sftp_username_var.get())
             self.config.set('SFTP', 'password', self.sftp_password_var.get())
             self.config.set('SFTP', 'remote_path', self.sftp_remote_path_var.get())
+
+            # 儲存 API 設定
+            if not self.config.has_section('API'):
+                self.config.add_section('API')
+            self.config.set('API', 'host', self.api_host_var.get())
+            self.config.set('API', 'port', self.api_port_var.get())
+            self.config.set('API', 'api', self._normalize_api_path(self.api_path_var.get()))
+            self.config.set('API', 'region', self.api_region_var.get())
             
             # 儲存 DATABASE 設定
             if not self.config.has_section('DATABASE'):
@@ -606,6 +659,14 @@ class ICRModernApp(tk.Tk):
                 self.config.set('SFTP', 'username', self.sftp_username_var.get())
                 self.config.set('SFTP', 'password', self.sftp_password_var.get())
                 self.config.set('SFTP', 'remote_path', self.sftp_remote_path_var.get())
+
+                # 儲存 API 設定
+                if not self.config.has_section('API'):
+                    self.config.add_section('API')
+                self.config.set('API', 'host', self.api_host_var.get())
+                self.config.set('API', 'port', self.api_port_var.get())
+                self.config.set('API', 'api', self._normalize_api_path(self.api_path_var.get()))
+                self.config.set('API', 'region', self.api_region_var.get())
                 
                 # 儲存 DATABASE 設定
                 if not self.config.has_section('DATABASE'):
@@ -682,6 +743,17 @@ class ICRModernApp(tk.Tk):
                         self.sftp_password_var.set(new_config.get('SFTP', 'password'))
                     if new_config.has_option('SFTP', 'remote_path'):
                         self.sftp_remote_path_var.set(new_config.get('SFTP', 'remote_path'))
+
+                # 載入 API 設定
+                if new_config.has_section('API'):
+                    if new_config.has_option('API', 'host'):
+                        self.api_host_var.set(new_config.get('API', 'host'))
+                    if new_config.has_option('API', 'port'):
+                        self.api_port_var.set(new_config.get('API', 'port'))
+                    if new_config.has_option('API', 'api'):
+                        self.api_path_var.set(new_config.get('API', 'api'))
+                    if new_config.has_option('API', 'region'):
+                        self.api_region_var.set(new_config.get('API', 'region'))
                 
                 # 載入 DATABASE 設定
                 if new_config.has_section('DATABASE'):
@@ -779,6 +851,13 @@ class ICRModernApp(tk.Tk):
                 'user': self.db_username_var.get(),
                 'password': self.db_password_var.get()
             }
+
+            api_config_override = {
+                'host': self.api_host_var.get(),
+                'port': self.api_port_var.get(),
+                'api': self._normalize_api_path(self.api_path_var.get()),
+                'region': self.api_region_var.get()
+            }
             
             result = self.orchestrator.execute_test_workflow(
                 doc_type=self.selected_doc_type,
@@ -787,6 +866,7 @@ class ICRModernApp(tk.Tk):
                 stop_check_callback=lambda: self.stop_requested,
                 sftp_config_override=sftp_config_override,
                 db_config_override=db_config_override,
+                api_config_override=api_config_override,
                 answer_format=self.answer_format_var.get()
             )
             
@@ -824,6 +904,13 @@ class ICRModernApp(tk.Tk):
                 'user': self.db_username_var.get(),
                 'password': self.db_password_var.get()
             }
+
+            api_config_override = {
+                'host': self.api_host_var.get(),
+                'port': self.api_port_var.get(),
+                'api': self._normalize_api_path(self.api_path_var.get()),
+                'region': self.api_region_var.get()
+            }
             
             result = self.orchestrator.execute_no_answer_workflow(
                 doc_type=self.selected_doc_type,
@@ -831,6 +918,7 @@ class ICRModernApp(tk.Tk):
                 stop_check_callback=lambda: self.stop_requested,
                 sftp_config_override=sftp_config_override,
                 db_config_override=db_config_override,
+                api_config_override=api_config_override,
                 answer_format=self.answer_format_var.get()
             )
             
@@ -927,6 +1015,15 @@ class ICRModernApp(tk.Tk):
             os.startfile(self.result_file_path)
         else:
             messagebox.showerror("錯誤", "結果檔案不存在")
+
+    def _normalize_api_path(self, api_path: str) -> str:
+        """正規化 API 路徑，確保以 / 開頭"""
+        api_path = (api_path or '').strip()
+        if not api_path:
+            return '/api/v1/batchRecognition'
+        if not api_path.startswith('/'):
+            return f'/{api_path}'
+        return api_path
 
 
 if __name__ == "__main__":

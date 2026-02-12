@@ -250,6 +250,37 @@ class ConfigManager:
             }
         
         return self.database.get_connection_config(self.runtime_config)
+
+    def get_api_config(self, override_config: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+        """取得 API 配置"""
+        if self.runtime_config is None:
+            self.load_runtime_config()
+
+        api_section = self.runtime_config['API'] if self.runtime_config.has_section('API') else {}
+
+        defaults = {
+            'host': '127.0.0.1',
+            'port': '5003',
+            'api': '/api/v1/batchRecognition',
+            'region': 'taipei'
+        }
+
+        base_config = {
+            'host': api_section.get('host', defaults['host']),
+            'port': api_section.get('port', defaults['port']),
+            'api': api_section.get('api', defaults['api']),
+            'region': api_section.get('region', defaults['region'])
+        }
+
+        if override_config:
+            return {
+                'host': override_config.get('host', base_config['host']),
+                'port': override_config.get('port', base_config['port']),
+                'api': override_config.get('api', base_config['api']),
+                'region': override_config.get('region', base_config['region'])
+            }
+
+        return base_config
     
     
     def get_doc_type_config(self, doc_type: str) -> DocumentTypeConfig:
