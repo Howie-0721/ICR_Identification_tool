@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# PyInstaller
+build/
+dist/
+*.spec.bak
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Local config (may contain credentials)
+config.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+Answer/*
+!Answer/.gitkeep
+
+# DB CSVs are required for the app to run; keep them tracked
+
+Log/*
+!Log/.gitkeep
+Upload_folder/ARC/*
+Upload_folder/Health/*
+Upload_folder/Employment/*
+!Upload_folder/*/.gitkeep
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
