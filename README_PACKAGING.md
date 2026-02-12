@@ -2,6 +2,18 @@
 
 ## 🚀 快速開始
 
+### 🔐 設定檔（重要）
+
+此專案的 `config.ini` 可能包含 SFTP/DB 帳密，已被加入 `.gitignore`，請勿提交到 GitHub。
+
+第一次使用請先建立本機設定檔：
+
+```powershell
+copy .\config.example.ini .\config.ini
+```
+
+再依你的環境修改 `config.ini` 內容。
+
 ### 打包成 EXE
 
 **最簡單的方式：**
