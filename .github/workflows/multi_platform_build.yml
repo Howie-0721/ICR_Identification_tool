@@ -42,7 +42,7 @@ jobs:
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             pyinstaller perf_test.spec --clean
           else
-            pyinstaller perf_test.macos.spec --clean --noupx
+            pyinstaller perf_test.macos.spec --clean
           fi
 
       - name: Add runtime folders/files
