@@ -52,6 +52,9 @@ jobs:
                    dist/perf_test/Upload_folder/ARC dist/perf_test/Upload_folder/Health dist/perf_test/Upload_folder/Employment
           # Include DB CSVs required by the app
           cp -f DB/*.csv dist/perf_test/DB/ || true
+          # Ensure excel templates are always present in artifact
+          mkdir -p dist/perf_test/excel_template
+          cp -Rf excel_template/. dist/perf_test/excel_template/ || true
 
       - name: Archive artifact (Windows)
         if: runner.os == 'Windows'
