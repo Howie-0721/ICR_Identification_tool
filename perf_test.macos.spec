@@ -68,3 +68,10 @@ coll = COLLECT(
     upx_exclude=[],
     name='perf_test',
 )
+
+app = BUNDLE(
+    coll,
+    name='perf_test.app',
+    icon=None,
+    bundle_identifier=None,
+)

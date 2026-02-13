@@ -32,6 +32,12 @@ python main.py
 pyinstaller perf_test.spec --clean
 ```
 
+## CI 打包產物（GitHub Actions）
+
+- push / PR 到 `main` 會觸發跨平台打包 workflow
+- Windows：產出 `dist/perf_test`，並上傳 `perf_test-Windows.zip`
+- macOS：產出 `dist/perf_test.app`，並上傳 `perf_test-macOS.zip`（內容為 `.app`）
+
 ## 設定檔說明
 
 - `config.ini`：實際執行用設定（已被 `.gitignore` 忽略，避免把 SFTP/DB 帳密推到 GitHub）

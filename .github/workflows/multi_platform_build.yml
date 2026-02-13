@@ -48,13 +48,19 @@ jobs:
       - name: Add runtime folders/files
         shell: bash
         run: |
-          mkdir -p dist/perf_test/Answer dist/perf_test/DB dist/perf_test/Log \
-                   dist/perf_test/Upload_folder/ARC dist/perf_test/Upload_folder/Health dist/perf_test/Upload_folder/Employment
+          if [[ "${{ runner.os }}" == "macOS" ]]; then
+            TARGET_ROOT="dist/perf_test.app/Contents/MacOS"
+          else
+            TARGET_ROOT="dist/perf_test"
+          fi
+
+          mkdir -p "$TARGET_ROOT/Answer" "$TARGET_ROOT/DB" "$TARGET_ROOT/Log" \
+                   "$TARGET_ROOT/Upload_folder/ARC" "$TARGET_ROOT/Upload_folder/Health" "$TARGET_ROOT/Upload_folder/Employment"
           # Include DB CSVs required by the app
-          cp -f DB/*.csv dist/perf_test/DB/ || true
+          cp -f DB/*.csv "$TARGET_ROOT/DB/" || true
           # Ensure excel templates are always present in artifact
-          mkdir -p dist/perf_test/excel_template
-          cp -Rf excel_template/. dist/perf_test/excel_template/ || true
+          mkdir -p "$TARGET_ROOT/excel_template"
+          cp -Rf excel_template/. "$TARGET_ROOT/excel_template/" || true
 
       - name: Archive artifact (Windows)
         if: runner.os == 'Windows'
@@ -68,7 +74,7 @@ jobs:
         shell: bash
         run: |
           cd dist
-          zip -r "perf_test-${{ runner.os }}.zip" perf_test
+          zip -r "perf_test-${{ runner.os }}.zip" perf_test.app
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
